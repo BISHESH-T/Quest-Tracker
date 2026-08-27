@@ -1,0 +1,90 @@
+body{
+    background-image: url('https://images.steamusercontent.com/ugc/1619563788295505858/23C72D743B3484AB383740A2069BA5317F0E722F/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false');
+    background-size: cover; /* Ensures the image covers the entire screen */
+    background-position: center center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents repeating the image */
+    height: 80vh; /* Ensures the background covers the full viewport height */
+}
+
+
+.container {
+    display: block;
+    padding: 30px; /* Increased padding for better breathing room */
+    
+    /* GLASS EFFECT PROPERTIES */
+    background: rgba(255, 255, 255, 0.1); /* Very light semi-transparent white */
+    backdrop-filter: blur(12px); /* This creates the actual "frosted glass" blur */
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    
+    /* Borders and Styling */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Soft, subtle border */
+    border-radius: 20px; /* Softer rounded corners feel more modern */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37); /* Deeper shadow for depth */
+    
+    font-size: 20px;
+    color: #ffffff; /* White text looks better on glass */
+    text-align: center;
+    font-family: sans-serif;
+    
+    width: 30%;
+    margin-left: 35%;
+    margin-top: 50px;
+    position: relative;
+    z-index: 1;
+}
+
+.login{
+    display: block;
+    position: relative;
+    padding-top: 20px
+}
+
+
+.button{
+    background-color: #3a3b3f;
+    padding: 10px;
+    width: 80%;
+    border: 2px solid #3a3b3f;
+    border-radius: 5px;
+    color: #dac7a6;
+    cursor: pointer;
+}
+
+.button:hover{
+    background-color: #4d4f53;
+    border-color: #4d4f53;
+}
+
+.link{
+    display: block;
+    color: #dabe90;
+    text-decoration: none;
+    font-size: 15px;
+}
+
+
+input[type="text"] {
+    display: block;
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid #000;
+    height: 40px;
+    padding: 10px;
+    margin-left: 9%;
+    font-family: sans-serif;
+}
+
+input[type="password"] {
+    display: block;
+    width: 80%;
+    border-radius: 5px;
+    border: 1px solid #000;
+    padding: 10px;
+    margin-left: 9%;
+    font-family: sans-serif;
+  
+}
+
+img{
+    max-width: 70%;
+}

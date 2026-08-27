@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Tracker</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="icon" href="{% static 'images/paimon.ico' %}" type="images/icon">
+</head>
+<body>
+    <h1>Hello, {{username}}</h1>
+    <a class="archive" href="/quests/" style="color: #ffffff; text-decoration: none;"> View Archived quests➡</a>
+    <div class="balance" >
+        <img src="{% static 'images/primos.png' %}">
+        <span id="balance" style="font-size: 30px;">{{balance}}</span>
+    </div>
+    <br>
+    
+    <div class="container" id="yesTime" style="display: none;">
+        <h3>Your progress has been tracked successfully. Come back tomorrow for more.</h3>
+        <div class="time">
+            <span id="countdown" data-seconds="{{ time_remaining_seconds }}">{{ time_remaining }}</span>
+        </div>
+    </div>
+
+    <div class="container" id="noTime" style="display: none;">
+        <h3>You did not complete your daily quest. Come back tomorrow for more.</h3>
+        <div class="time">
+            <span id="countdown" data-seconds="{{ time_remaining_seconds }}">{{ time_remaining }}</span>
+        </div>
+    </div>
+
+    <div class="container" id="content">
+        <h3>Did you complete your Daily Quests ?</h3>
+        <button id="yes" onclick="newPrompt()">Yes</button>
+        <button id="no" >No</button>
+    </div>
+
+    <div class="container" id="formContainer" style="display: none;">
+        <h3>Describe your todays work</h3>
+        <form id="inputForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <textarea id="textbox" name="description"></textarea><br>
+            <input type="file" id="fileInput" name="fileInput" onchange="updateLabel()" multiple required><br>
+            <label for="fileInput" id="label">Choose file</label><br>
+            <input type="submit" id="submit" value="Submit">
+        </form>
+    </div>
+
+    <div class="overlay" id="overlayYes"></div>
+    <div class="popup" id="popupYes">
+        <img src="https://media.tenor.com/5NJRMfcMXQUAAAAj/hu-tao-pat.gif">
+        <p>Good Job pookie bear.</p>
+        <button onclick="closePopupYes()">Done</button>
+    </div>
+
+    <div class="overlay" id="overlayNo"></div>
+    <div class="popup" id="popupNo">
+        <img src="https://media.tenor.com/KTZ_3XSy23UAAAAM/mihoyo-genshin-impact-genshinimpact-paimon.gif">
+        <p>Piece of shit.</p>
+        <button onclick="closePopupNo()">Done</button>
+    </div>
+
+    <div class="logout">
+        <form method="POST" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    </div>
+
+    <script src="{% static 'js/script.js' %}"></script>
+</body>
+</html>

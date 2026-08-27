@@ -1,0 +1,62 @@
+<html>
+{% load static %}
+<head>
+<title>Quest Tracker</title>
+<link rel="stylesheet" href="{% static 'css/login.css' %}">
+<link rel="icon" href="{% static 'images/paimon.ico' %}" type="images/icon">
+</head>
+<body>
+    {% if messages %}
+    <div class="messageContainer" id="box">
+        {% for message in messages %}
+            <p id="flash-message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            var messages = document.querySelectorAll("#box");
+            messages.forEach(function(message) {
+                message.style.display = "none";  // Hide each message after 3 seconds
+            });
+        }, 5000); // Hides the messages after 5 seconds
+    </script>
+    <style>
+        #box{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 10px;
+            padding: 5px;
+            padding-top: -5px;
+            background-color: #323339;
+            height: 5%;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif; 
+            margin-left: 44%;
+            margin-top: 100px;
+            position: fixed;
+            z-index:2;
+        }
+    </style>
+    
+    {% endif %}
+    <div class="container">
+        <img src="{% static 'images/logo.png' %}">
+            <div>
+            <form method="POST">
+                <div class="login">
+                {% csrf_token %}
+                <input type="text" name="username" placeholder="Email/Username" required><br>
+                <input type="password" name="password" placeholder="Password" required><br>
+                </div>
+                <button type="submit" class="button">Log In</button>
+            </form>
+            <a class="link" href="{% url 'signup' %}">Register Now</a>
+        </div>
+    </div>
+
+
+   
+</body>
+</html>

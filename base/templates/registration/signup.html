@@ -1,0 +1,61 @@
+<html>
+{% load static %}
+<head>
+<title>Quest Tracker</title>
+<link rel="stylesheet" href="{% static 'css/signup.css' %}">
+<link rel="icon" href="{% static 'images/paimon.ico' %}" type="images/icon">
+</head>
+<body>
+    {% if messages %}
+    <div class="messageContainer" id="box">
+        {% for message in messages %}
+            <p id="flash-message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            var messages = document.querySelectorAll("#box");
+            messages.forEach(function(message) {
+                message.style.display = "none";  // Hide each message after 3 seconds
+            });
+        }, 5000); // Hides the messages after 5 seconds
+    </script>
+    <style>
+        #box{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 10px;
+            padding: 5px;
+            padding-top: -5px;
+            background-color: #323339;
+            height: 5%;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif; 
+            margin-left: 44%;
+            margin-top: 210px;
+            position: fixed;
+            z-index:2;
+        }
+    </style>
+    
+    {% endif %}
+    <div class="container">
+        <img src="{% static 'images/logo.png' %}">
+        <div>
+        <form method="POST">
+            {% csrf_token %}
+            <br>
+            <input type="email" name="email" placeholder="Email"required><br>
+            <input type="text" name="username" placeholder="Username"required><br>
+            <input type="password" name="pass1" placeholder="Enter Password"required><br>
+            <input type="password" name="pass2" placeholder="Confirm Password"required><br>
+            <button class="button" type="submit">Sign Up</button><br>
+            <label class="label">Already have an account?</label>
+            <a class="link" href="{% url 'authView' %}">Login</a>
+        </form>
+        </div>
+    </div>
+</body>
+</html>

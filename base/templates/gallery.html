@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quest Archive</title>
+    <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+    <link rel="icon" href="{% static 'images/paimon.ico' %}" type="image/x-icon">
+</head>
+<body>
+
+    <div class="logo_w">
+        <img src="{% static 'css/QAW.png' %}" alt=" logo_w">
+
+    </div>
+
+    <div class="balance">
+        <img src="{% static 'images/primos.png' %}" alt="Primogem Icon">
+        <span id="balance" style="font-size: 30px;">{{ balance }}</span>
+    </div>
+    <a class="return" href="/" style="color: #ffffff; text-decoration: none;">⬅ Back to Quest Dashboard</a>
+    
+    <div class="gallery-container">
+        
+        <div class="gallery-column">
+            <h3 style="color: #c6ceea; border-bottom: 2px solid #c6ceea; padding-bottom: 8px;">My Quests</h3>
+            
+            {% if personal_submissions %}
+                {% for entry in personal_submissions %}
+                    <div class="log-card">
+                        <div class="timestamp">Submitted on: {{ entry.submitted_at|date:"Y-m-d H:i" }}</div>
+                        <p><strong>Description:</strong> {{ entry.work_description }}</p>
+                        
+                        {% if entry.has_proof %}
+                            <p style="margin-bottom: 5px;"><strong>Attachment Proofs:</strong></p>
+                            <div class="image-preview-grid">
+                                {% for path in entry.proof_list %}
+                                    <img src="/media/{{ path }}" class="proof-img" alt="Personal Proof File">
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p style="color: #99aab5; font-style: italic; font-size: 13px;">No attachment uploaded.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #99aab5; font-style: italic;">Your history sheet is entirely empty. Go log today's quest!</p>
+            {% endif %}
+        </div>
+
+        <div class="gallery-column">
+            <h3 style="color: #c6ceea; border-bottom: 2px solid #c6ceea; padding-bottom: 8px;"> Community Feed</h3>
+            
+            {% if public_submissions %}
+                {% for entry in public_submissions %}
+                    <div class="log-card public-card">
+                        <span class="username-badge" style="color: #ffffff; font-weight: bold; margin-bottom: 5px; display: block;">
+                            @{{ entry.user.username }}
+                        </span>
+                        
+                        <div class="timestamp">Shared on: {{ entry.submitted_at|date:"Y-m-d H:i" }}</div>
+                        <p><strong>Description:</strong> {{ entry.work_description }}</p>
+                        
+                        {% if entry.has_proof %}
+                            <p style="margin-bottom: 5px;"><strong>Attachment Proofs:</strong></p>
+                            <div class="image-preview-grid">
+                                {% for path in entry.proof_list %}
+                                    <img src="/media/{{ path }}" class="proof-img" alt="Public Proof File">
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p style="color: #99aab5; font-style: italic; font-size: 13px;">No attachment uploaded.</p>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p style="color: #99aab5; font-style: italic;">No public quests shared by the community yet.</p>
+            {% endif %}
+        </div>
+
+    </div>
+</body>
+</html>
