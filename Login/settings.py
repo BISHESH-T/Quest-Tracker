@@ -78,11 +78,21 @@ WSGI_APPLICATION = 'Login.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default='mysql://root:genshin.11T@localhost:3306/credential',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'credential',
+        'USER': 'root',
+        'PASSWORD': 'genshin.11T',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
 }
+
+if os.environ.get('DATABASE_URL'):
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        ssl_require=True
+    )
 
 
 # Password validation
