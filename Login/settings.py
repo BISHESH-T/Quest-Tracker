@@ -88,11 +88,15 @@ DATABASES = {
     }
 }
 
+# Override database settings on Render
 if os.environ.get('DATABASE_URL'):
-    DATABASES['default'] = dj_database_url.config(
-        conn_max_age=600,
-        ssl_require=True
-    )
+    db_config = dj_database_url.config(conn_max_age=600)
+    
+    # Remove any incompatible sslmode parameters injected by dj_database_url for MySQL
+    if 'OPTIONS' in db_config and 'sslmode' in db_config['OPTIONS']:
+        del db_config['OPTIONS']['sslmode']
+        
+    DATABASES['default'] = db_config
 
 
 # Password validation
