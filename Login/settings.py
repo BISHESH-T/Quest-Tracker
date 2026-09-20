@@ -24,10 +24,13 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-dev-key-change-in-production')
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('RENDER', False) == False
+
+
+SECRET_KEY = config('SECRET_KEY')
+
+
+DEBUG = config('DEBUG', default=False, cast=bool)
+
 ALLOWED_HOSTS = ['*']
 
 
@@ -84,10 +87,11 @@ WSGI_APPLICATION = 'Login.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default=config('DATABASE_URL', default='')
+        default=config('DATABASE_URL', default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}"),
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
-
 
 
 # Password validation
@@ -134,10 +138,6 @@ MEDIA_URL = '/media/'
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-if DEBUG:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-else:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -168,6 +168,6 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
