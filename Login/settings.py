@@ -171,3 +171,6 @@ STORAGES = {
         "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
     },
 }
+
+# Compatibility fix for django-cloudinary-storage on Django 5.1+
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
