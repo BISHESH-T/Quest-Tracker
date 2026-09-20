@@ -1,4 +1,4 @@
-Django==5.1.7
+Django==5.2.15
 django-cloudinary-storage
 cloudinary
 psycopg2-binary
