@@ -2,7 +2,7 @@
 
 Quest Tracker is a full-stack, gamified task management web application inspired by **Genshin Impact's daily commission system**. Users complete real-world daily tasks, submit image proof of their progress, and earn in-app currency to track personal growth.
 
- **Live Application:** [https://quest-tracker-6wt3.onrender.com/login/](https://quest-tracker-6wt3.onrender.com/login/)
+ **Live Application:** [https://quest-tracker-jl7r.onrender.com/](https://quest-tracker-jl7r.onrender.com/)
 
 ---
 
