@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
+    'cloudinary_storage',
     'cloudinary',
     'base',
 ]
@@ -173,5 +173,5 @@ STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 CSRF_TRUSTED_ORIGINS = [
-    'https://quest-tracker-6wt3.onrender.com',  # your actual Render URL
+    'https://quest-tracker-jl7r.onrender.com',  # your actual Render URL
 ]
