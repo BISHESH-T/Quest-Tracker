@@ -151,19 +151,21 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
 }
 
-# Legacy Static & Media Files Configuration
 # Static & Media Files Configuration
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Tell Django where to look for your development static files
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Use WhiteNoise to serve static files directly in production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Primary Storage Engine for Django 5.1+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
-
-# Cloudinary default storage for media uploads
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
