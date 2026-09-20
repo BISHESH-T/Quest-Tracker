@@ -7,3 +7,4 @@ dj-database-url>=2.0.0
 python-dotenv==1.2.3
 pytz==2026.3.post1
 python-decouple==3.8
+whitenoise
