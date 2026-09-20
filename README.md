@@ -62,6 +62,12 @@ Ensure you have the following installed locally:
    ```env
    SECRET_KEY=your_django_secret_key
    DEBUG=True
+
+   DATABASE_URL=postgres://user:password@endpoint.neon.tech/dbname?sslmode=require
+   
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
    ```
 
 5. **Run Database Migrations:**
