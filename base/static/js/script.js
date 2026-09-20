@@ -1,3 +1,21 @@
+(function syncTimezone() {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (!tz) return;
+
+    const current = document.cookie.split('; ')
+        .find(r => r.startsWith('user_tz='))?.split('=')[1];
+
+    if (current !== tz) {
+        document.cookie = `user_tz=${tz}; path=/; max-age=31536000; SameSite=Lax`;
+
+        // reload once per timezone value, so blocked cookies can't cause a loop
+        if (sessionStorage.getItem('tzReloadedFor') !== tz) {
+            sessionStorage.setItem('tzReloadedFor', tz);
+            location.reload();
+        }
+    }
+})();
+
 // --- 1. DOM ELEMENT SELECTORS ---
 const x = document.getElementById('yes');
 const y = document.getElementById('no');
