@@ -174,4 +174,13 @@ body {
     filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.2));
 }
 
+.delete-btn {
+    background-color: rgba(25, 25, 25, 0.85); 
+    border-radius: 8px;
+    padding: 10px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-family: sans-serif;
+    color: white; 
+}
+
 

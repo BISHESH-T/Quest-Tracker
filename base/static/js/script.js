@@ -8,33 +8,9 @@ let overlayYes = document.getElementById('overlayYes');
 let popupNo = document.getElementById('popupNo');
 let overlayNo = document.getElementById('overlayNo');
 let content = document.getElementById('content');
-let yesTime = document.getElementById('yesTime');
-let noTime = document.getElementById('noTime');
-let count = parseInt(document.getElementById("balance").innerText);
 
 const fileName = document.getElementById('label');
 const fileInput = document.getElementById('fileInput');
-
-// --- 2. ASYNCHRONOUS DATABASE SYNC ENGINE ---
-function balanceUpdate() {
-    document.getElementById("balance").innerText = count;
-
-    // Send an AJAX request to update the balance in the database
-    fetch('/update_balance/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCSRFToken()
-        },
-        body: JSON.stringify({ balance: count })
-    });
-}
-
-// Fixed balance lookup function signature assignment wrapper
-function updateLiveUIBalance(amount) {
-    count = amount;
-    balanceUpdate();
-}
 
 function getCSRFToken() {
     return document.cookie.split('; ')
@@ -42,37 +18,47 @@ function getCSRFToken() {
         ?.split('=')[1];
 }
 
-// --- 3. INTERFACE WORKFLOW CONTROLLERS ---
+// --- 2. INTERFACE WORKFLOW CONTROLLERS ---
 
-// Clicking "YES" brings up the submission text/file form container
 if (x) {
     x.addEventListener('click', function(){
-        formContainer.style.display = "block";
-        content.style.display = "none";
+        if (formContainer) formContainer.style.display = "block";
+        if (content) content.style.display = "none";
     });
 }
 
-// Clicking "NO" applies an instant penalty stream via background AJAX channel
 if (y) {
     y.addEventListener('click', function(){
-        content.style.display = "none";
-        popupNo.style.display = "block";
-        overlayNo.style.display = "block";
+        if (content) content.style.display = "none";
+        if (popupNo) popupNo.style.display = "block";
+        if (overlayNo) overlayNo.style.display = "block";
 
-        count -= 50;
-        balanceUpdate();
+        let balanceElem = document.getElementById("balance");
+        if (balanceElem) {
+            let currentBalance = parseInt(balanceElem.innerText) || 0;
+            currentBalance -= 50;
+            balanceElem.innerText = currentBalance;
+
+            // Sync penalty to database
+            fetch('/update_balance/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: JSON.stringify({ balance: currentBalance })
+            });
+        }
     });
 }
 
-// Handling the "YES" Path Form Submission via Asynchronous AJAX Fetch
+// Handling Form Submission
 if (inputForm) {
     inputForm.addEventListener('submit', function(event) {
-        event.preventDefault(); // Stop the browser from refreshing the page!
+        event.preventDefault(); 
 
-        // Gather text input values and media binary assets automatically
         let formData = new FormData(inputForm);
 
-        // Ship the payload data asynchronously straight to your Django home view
         fetch('/', {
             method: 'POST',
             headers: {
@@ -80,18 +66,21 @@ if (inputForm) {
             },
             body: formData
         })
-        .then(response => {
-            if (response.ok) {
-                // Award points locally and sync with the database record row
-                count += 10;
-                balanceUpdate();
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "success") {
+                // Update live balance score
+                let balanceElem = document.getElementById("balance");
+                if (balanceElem && data.new_balance !== undefined) {
+                    balanceElem.innerText = data.new_balance;
+                }
 
-                // Open the confirmation dialog popup and hide the workspace inputs
-                popupYes.style.display = "block";
-                overlayYes.style.display = "block";  
-                formContainer.style.display = "none";
+                // Show confirmation modal
+                if (popupYes) popupYes.style.display = "block";
+                if (overlayYes) overlayYes.style.display = "block";  
+                if (formContainer) formContainer.style.display = "none";
             } else {
-                alert("Submission failed. Please check your network or server logs.");
+                alert(data.message || "Submission failed.");
             }
         })
         .catch(error => {
@@ -100,36 +89,36 @@ if (inputForm) {
     });
 }
 
-// Transition functions triggered by clicking the "Done" buttons inside your popups
 function closePopupYes() {
-    popupYes.style.display = "none";
-    overlayYes.style.display = "none";
+    if (popupYes) popupYes.style.display = "none";
+    if (overlayYes) overlayYes.style.display = "none";
     
-    // 1. Smoothly reveal the live ticking midnight countdown element container
-    if (yesTime) yesTime.style.display = "block"; 
+    if (content) content.style.display = "none";
+    if (formContainer) formContainer.style.display = "none";
     
-    // 2. Clear out the internal form pointers safely without destroying DOM variables
-    if (inputForm) {
-        inputForm.reset();
+    // Reveal success countdown
+    let yesTime = document.getElementById('yesTime');
+    if (yesTime) {
+        yesTime.style.display = "block"; 
     }
     
-    // 3. Reset the visual file selector string safely back to original state
-    if (fileName) {
-        fileName.textContent = 'Choose File';
-    }
+    if (inputForm) inputForm.reset();
+    if (fileName) fileName.textContent = 'Choose File';
 }
 
 function closePopupNo(){
-    popupNo.style.display = "none";
-    overlayNo.style.display = "none";
-    if (noTime) noTime.style.display = "block";
-}
-
-function newPrompt(){
+    if (popupNo) popupNo.style.display = "none";
+    if (overlayNo) overlayNo.style.display = "none";
+    
     if (content) content.style.display = "none";
+    
+    // Reveal failure countdown
+    let noTime = document.getElementById('noTime');
+    if (noTime) {
+        noTime.style.display = "block";
+    }
 }
 
-// Handles custom styling labels for single or multiple uploaded attachment counts
 function updateLabel() {
     if (!fileInput || !fileName) return;
     let totalFiles = fileInput.files.length;
@@ -145,9 +134,9 @@ function updateLabel() {
     }
 }
  
-// --- 4. DYNAMIC LIVE COUNTDOWN ENGINE ---
+// --- 3. DYNAMIC LIVE COUNTDOWN ENGINE ---
 function startLiveCountdown() {
-    const clocks = document.querySelectorAll('[id="countdown"]');
+    const clocks = document.querySelectorAll('#countdown');
     if (clocks.length === 0) return;
 
     let secondsLeft = parseInt(clocks[0].getAttribute('data-seconds')) || 0;
@@ -174,5 +163,5 @@ function startLiveCountdown() {
     }, 1000);
 }
 
-// Fire up tracking loops
+// Start tracking loop
 startLiveCountdown();

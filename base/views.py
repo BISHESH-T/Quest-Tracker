@@ -10,6 +10,8 @@ from .models import UserProfile, QuestSubmission
 from django.utils.timezone import now
 from datetime import timedelta
 import pytz
+from django.shortcuts import get_object_or_404
+
 
 # Create your views here.
 
@@ -31,48 +33,42 @@ def update_balance(request):
 
 @login_required
 def home(request):
-    # 1. Profile Safeguard: Get profile or create one on the fly if it doesn't exist
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    # 2. Timezone Normalization (Defaults to Kathmandu Valley standard time)
-    user_tz = pytz.timezone(user_profile.timezone if user_profile.timezone else "Asia/Kathmandu")
+    tz_name = user_profile.timezone if user_profile.timezone else "Asia/Kathmandu"
+    user_tz = pytz.timezone(tz_name)
     user_now = now().astimezone(user_tz)
-    
-    # Extract the calendar date of the last successful check-in
-    last_quest_date = user_profile.last_quest.astimezone(user_tz).date() if user_profile.last_quest else None
 
+    if user_profile.last_quest:
+        last_quest_local_date = user_profile.last_quest.astimezone(user_tz).date()
+        quest_marked = (last_quest_local_date == user_now.date())
+    else:
+        quest_marked = False
 
-    # 4. Form Action Engine: Process the daily check-in/quest submission
     if request.method == "POST":
         description = request.POST.get("description")
         
-        # 🔓 SAFE LOGIC UPDATES: Update the core profile values once
-        submission_time = now()
-        user_profile.last_quest = submission_time  
+        user_profile.last_quest = now()  
         user_profile.quest_status = "Yes" 
         user_profile.balance += 10       
         user_profile.save()
         
-        # Sync the local tracking date string instantly for Section 5
-        last_quest_date = submission_time.astimezone(user_tz).date()
-        
-        # 👑 COMMA-SEPARATED MULTI-FILE HANDLING
         uploaded_files = request.FILES.getlist("fileInput")
-        saved_paths = []
+        saved_urls = []
         
         if uploaded_files:
             from django.core.files.storage import default_storage
             for f in uploaded_files:
-                # Manually write each file into the storage engine directory
+                # default_storage will now upload to Cloudinary and return the relative path/filename
                 file_name = default_storage.save(f'quest_submissions/{f.name}', f)
-                saved_paths.append(file_name)
+                # Obtain the full secure HTTPS URL from Cloudinary
+                file_url = default_storage.url(file_name)
+                saved_urls.append(file_url)
                 
-            # Combine paths array list down into a single flat string variable container row
-            combined_paths = ",".join(saved_paths)
+            combined_paths = ",".join(saved_urls)
         else:
             combined_paths = None
 
-        # Creates exactly ONE database row entry per submission event (without is_public)
         QuestSubmission.objects.create(
             user=request.user,
             work_description=description if description else "No description provided.",
@@ -85,11 +81,8 @@ def home(request):
             "new_balance": user_profile.balance
         })
 
-    quest_marked = (last_quest_date == user_now.date())
-    
-    # Calculate exact seconds remaining until next local midnight reset
     next_reset = user_now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-    time_remaining_seconds = int((next_reset - user_now).total_seconds())
+    time_remaining_seconds = max(0, int((next_reset - user_now).total_seconds()))
 
     hours = time_remaining_seconds // 3600
     minutes = (time_remaining_seconds % 3600) // 60
@@ -146,36 +139,64 @@ def signup(request):
     return render(request, 'registration/signup.html')
 
 
+from django.core.files.storage import default_storage
+
 @login_required
 def gallery(request):
     user_profile = UserProfile.objects.get(user=request.user)
     
-    personal_qs = request.user.submissions.all().order_by('-submitted_at')
+    tz_name = user_profile.timezone if user_profile.timezone else "Asia/Kathmandu"
+    user_tz = pytz.timezone(tz_name)
+    user_today = now().astimezone(user_tz).date()
     
+    personal_qs = request.user.submissions.all().order_by('-submitted_at')
     public_qs = QuestSubmission.objects.exclude(user=request.user).order_by('-submitted_at')
     
     personal_submissions = []
     for entry in personal_qs:
-        # Check if the field has a file name string present
-        proof_list = entry.uploaded_proof.name.split(',') if entry.uploaded_proof else []
+        # Get raw string safely whether it's a FieldFile, CharField, or None
+        raw_proof = str(entry.uploaded_proof) if entry.uploaded_proof else ""
+        raw_paths = [path.strip() for path in raw_proof.split(',') if path.strip()]
+        
+        # Resolve path to full Cloudinary URL if it isn't already a full URL
+        formatted_urls = []
+        for path in raw_paths:
+            if path.startswith('http://') or path.startswith('https://'):
+                formatted_urls.append(path)
+            else:
+                formatted_urls.append(default_storage.url(path))
+        
+        entry_local_date = entry.submitted_at.astimezone(user_tz).date()
+        is_today = (entry_local_date == user_today)
         
         personal_submissions.append({
+            'id': entry.id,
             'submitted_at': entry.submitted_at,
             'work_description': entry.work_description,
-            'proof_list': [p.strip() for p in proof_list if p.strip()],
-            'has_proof': bool(proof_list)
+            'proof_list': formatted_urls,
+            'has_proof': bool(formatted_urls),
+            'is_today': is_today
         })
 
     public_submissions = []
     for entry in public_qs:
-        proof_list = entry.uploaded_proof.name.split(',') if entry.uploaded_proof else []
+        # Fixed: str(entry.uploaded_proof) instead of entry.uploaded_proof.name
+        raw_proof = str(entry.uploaded_proof) if entry.uploaded_proof else ""
+        raw_paths = [path.strip() for path in raw_proof.split(',') if path.strip()]
+        
+        formatted_urls = []
+        for path in raw_paths:
+            if path.startswith('http://') or path.startswith('https://'):
+                formatted_urls.append(path)
+            else:
+                formatted_urls.append(default_storage.url(path))
         
         public_submissions.append({
             'user': entry.user,
             'submitted_at': entry.submitted_at,
             'work_description': entry.work_description,
-            'proof_list': [p.strip() for p in proof_list if p.strip()],
-            'has_proof': bool(proof_list)
+            'proof_list': formatted_urls,
+            'has_proof': bool(formatted_urls)
         })
     
     return render(request, "gallery.html", {
@@ -183,3 +204,29 @@ def gallery(request):
         'public_submissions': public_submissions,
         'balance': user_profile.balance
     })
+
+
+@login_required
+def delete_quest(request, pk):
+    if request.method == "POST":
+        user_profile = UserProfile.objects.get(user=request.user)
+        submission = get_object_or_404(QuestSubmission, pk=pk, user=request.user)
+        
+        tz_name = user_profile.timezone if user_profile.timezone else "Asia/Kathmandu"
+        user_tz = pytz.timezone(tz_name)
+        user_today = now().astimezone(user_tz).date()
+        
+        submission_local_date = submission.submitted_at.astimezone(user_tz).date()
+        
+        # Strictly enforce same-day deletion
+        if submission_local_date == user_today:
+            submission.delete()
+            user_profile.balance -= 10
+            user_profile.last_quest = None
+            user_profile.quest_status = None
+            user_profile.save()
+            messages.success(request, "Quest submission deleted successfully.")
+        else:
+            messages.error(request, "You can only delete quest submissions created today.")
+            
+    return redirect('quests')

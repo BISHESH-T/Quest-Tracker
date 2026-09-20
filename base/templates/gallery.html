@@ -35,13 +35,25 @@
                         {% if entry.has_proof %}
                             <p style="margin-bottom: 5px;"><strong>Attachment Proofs:</strong></p>
                             <div class="image-preview-grid">
-                                {% for path in entry.proof_list %}
-                                    <img src="/media/{{ path }}" class="proof-img" alt="Personal Proof File">
+                                {% for p in entry.proof_list %}
+                                    <img src="{{ p }}" alt="Quest Proof" class="proof-img">
                                 {% endfor %}
                             </div>
                         {% else %}
                             <p style="color: #99aab5; font-style: italic; font-size: 13px;">No attachment uploaded.</p>
                         {% endif %}
+
+                        {% if entry.is_today %}
+                        <div>
+                            <form action="{% url 'delete_quest' entry.id %}" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-btn" onclick="return confirm('Are you sure you want to delete today\'s quest?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        
                     </div>
                 {% endfor %}
             {% else %}
@@ -65,8 +77,8 @@
                         {% if entry.has_proof %}
                             <p style="margin-bottom: 5px;"><strong>Attachment Proofs:</strong></p>
                             <div class="image-preview-grid">
-                                {% for path in entry.proof_list %}
-                                    <img src="/media/{{ path }}" class="proof-img" alt="Public Proof File">
+                                {% for p in entry.proof_list %}
+                                    <img src="{{ p }}" alt="Public Quest Proof" class="proof-img">
                                 {% endfor %}
                             </div>
                         {% else %}

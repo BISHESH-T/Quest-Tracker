@@ -9,21 +9,28 @@
     <link rel="icon" href="{% static 'images/paimon.ico' %}" type="images/icon">
 </head>
 <body>
-    <h1>Hello, {{username}}</h1>
+    <h1>Hello, {{ username }}</h1>
     <a class="archive" href="/quests/" style="color: #ffffff; text-decoration: none;"> View Archived quests➡</a>
-    <div class="balance" >
+    
+    <div class="balance">
         <img src="{% static 'images/primos.png' %}">
-        <span id="balance" style="font-size: 30px;">{{balance}}</span>
+        <span id="balance" style="font-size: 30px;">{{ balance }}</span>
     </div>
     <br>
-    
+
+    <!-- SUCCESS COUNTDOWN: Always rendered, display controlled by Django or JS -->
+    {% if quest_marked %}
+    <div class="container" id="yesTime" style="display: block;">
+    {% else %}
     <div class="container" id="yesTime" style="display: none;">
+    {% endif %}
         <h3>Your progress has been tracked successfully. Come back tomorrow for more.</h3>
         <div class="time">
             <span id="countdown" data-seconds="{{ time_remaining_seconds }}">{{ time_remaining }}</span>
         </div>
     </div>
 
+    <!-- FAILURE COUNTDOWN -->
     <div class="container" id="noTime" style="display: none;">
         <h3>You did not complete your daily quest. Come back tomorrow for more.</h3>
         <div class="time">
@@ -31,12 +38,15 @@
         </div>
     </div>
 
+    {% if not quest_marked %}
+    <!-- QUEST PROMPT SECTION -->
     <div class="container" id="content">
         <h3>Did you complete your Daily Quests ?</h3>
-        <button id="yes" onclick="newPrompt()">Yes</button>
-        <button id="no" >No</button>
+        <button id="yes">Yes</button>
+        <button id="no">No</button>
     </div>
 
+    <!-- QUEST FORM SECTION -->
     <div class="container" id="formContainer" style="display: none;">
         <h3>Describe your todays work</h3>
         <form id="inputForm" method="POST" enctype="multipart/form-data">
@@ -47,7 +57,9 @@
             <input type="submit" id="submit" value="Submit">
         </form>
     </div>
+    {% endif %}
 
+    <!-- POPUPS -->
     <div class="overlay" id="overlayYes"></div>
     <div class="popup" id="popupYes">
         <img src="https://media.tenor.com/5NJRMfcMXQUAAAAj/hu-tao-pat.gif">

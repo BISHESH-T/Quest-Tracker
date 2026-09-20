@@ -17,7 +17,7 @@ class QuestSubmission(models.Model):
     work_description = models.TextField()
     
     # 👑 THE FIX: Explicitly increase max_length to 1000 characters
-    uploaded_proof = models.FileField(upload_to='quest_submissions/', max_length=1000, null=True, blank=True)
+    uploaded_proof = models.TextField(blank=True, null=True)
     
     submitted_at = models.DateTimeField(auto_now_add=True)
 

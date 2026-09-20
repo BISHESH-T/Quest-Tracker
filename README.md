@@ -19,7 +19,8 @@ Quest Tracker is a full-stack, gamified task management web application inspired
 
 - **Backend:** Python, Django
 - **Frontend:** HTML5, CSS3, JavaScript
-- **Database:** MySQL (Managed via Aiven Cloud DB), SQLite (Development)
+- **Database:** PostgreSQL (Managed via Neon Cloud DB), SQLite (Development)
+- **Media Storage:** Cloudinary
 - **Deployment & Hosting:** Render, Gunicorn, WhiteNoise
 
 ---
