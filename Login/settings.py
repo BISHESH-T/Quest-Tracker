@@ -29,7 +29,7 @@ load_dotenv(os.path.join(BASE_DIR, '.env'))
 SECRET_KEY = config('SECRET_KEY')
 
 
-DEBUG = config('DEBUG', default=False, cast=bool)
+DEBUG = True #config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['*']
 
