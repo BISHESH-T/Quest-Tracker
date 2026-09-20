@@ -163,14 +163,17 @@ CLOUDINARY_STORAGE = {
 }
 
 # Set Cloudinary as the default storage for user uploads (request.FILES / default_storage)
+# Unified Storage Engine (Django 4.2+)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+        # Using CompressedStaticFilesStorage prevents strict manifest missing-file crashes
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
+
 
 # Compatibility fix for django-cloudinary-storage on Django 5.1+
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
