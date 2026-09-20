@@ -169,11 +169,9 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        # Using CompressedStaticFilesStorage prevents strict manifest missing-file crashes
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
-
-# Compatibility fix for django-cloudinary-storage on Django 5.1+
+# Compatibility fallback for django-cloudinary-storage on Django 5.1+
 STATICFILES_STORAGE = STORAGES["staticfiles"]["BACKEND"]
