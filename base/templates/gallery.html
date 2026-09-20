@@ -10,6 +10,42 @@
 </head>
 <body>
 
+    {% if messages %}
+    <div class="messageContainer" id="box">
+        {% for message in messages %}
+            <p id="flash-message">{{ message }}</p>
+        {% endfor %}
+    </div>
+    <script>
+        setTimeout(function() {
+            var messages = document.querySelectorAll("#box");
+            messages.forEach(function(message) {
+                message.style.display = "none";  // Hide each message after 3 seconds
+            });
+        }, 5000); // Hides the messages after 5 seconds
+    </script>
+    <style>
+        #box{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            border-radius: 10px;
+            padding: 5px;
+            padding-top: -5px;
+            background-color: #323339;
+            height: 5%;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif; 
+            margin-left: 44%;
+            margin-top: 100px;
+            position: fixed;
+            z-index:2;
+        }
+    </style>
+    
+    {% endif %}
+
     <div class="logo_w">
         <img src="{% static 'css/QAW.png' %}" alt=" logo_w">
 
